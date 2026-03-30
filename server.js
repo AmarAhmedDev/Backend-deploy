@@ -40,6 +40,10 @@ connection.connect((error) => {
     });
 });
 
+app.get("/", (req, res) => {
+    res.send("Welcome To Student Form API");
+});
+
 app.post("/insert-student", (req, res) => {
     const { name, email, ids, phone, age, department } = req.body;
 
