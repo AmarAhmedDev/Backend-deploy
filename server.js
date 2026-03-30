@@ -2,80 +2,56 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql2");
 
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
+app.use(express.urlencoded({
+    extended: true
+}));
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "ip_form",
-  password: "1234567890",
-  database: "ip_form",
+app.use(express.json());
+
+const connection = mysql.createConnection({
+    host: "localhost",
+    user: "student_form",
+    password: "12345678",
+    database: "student_form"
 });
 
-db.connect((err) => {
-  if (err) {
-    console.log(`Error happen in connection ${err}`);
-    return;
-  }
-  console.log(`Database Successfuly connect`);
-});
+connection.connect((error) => {
+    if(error) {
+        console.log(`Error Happen In Connection ${error.message}`);
+        return;
+    }
 
-app.get("/", (req, res) => {
-  res.send("Wellcome to this form");
-});
-
-app.get("/create-table", (req, res) => {
-  const form = `CREATE TABLE IF NOT EXISTS Form (
+    const createTable = `CREATE TABLE IF NOT EXISTS Form (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        Name VARCHAR(255) NOT NULL,
-        Gender VARCHAR(255) NOT NULL,
-        Age INT(11) NOT NULL,
-        Email VARCHAR(255) NOT NULL
+        Name VARCHAR(255),
+        Email VARCHAR(255),
+        Student_ID VARCHAR(255),
+        Phone INT(10),
+        Age INT(10),
+        Department VARCHAR(255)
     )`;
 
-  db.query(form, (error, results, fields) => {
-    if (error) {
-      console.log(`Error happen in create table ${error}`);
-      return;
-    }
-  });
-
-  res.send("Table Created Successfully");
-});
-
-app.post("/insert-info", (req, res) => {
-  const { name, gender, age, email } = req.body;
-  // console.log(req.body)
-
-  const insertInfo = `INSERT INTO Form (Name, Gender, Age, Email) VALUES (?, ?, ?, ?)`;
-
-  db.query(insertInfo, [name, gender, age, email], (error, results, fields) => {
-    if (error) {
-      console.log(`Error happen in inserting table ${error}`);
-      return;
-    }
-  });
-
-  res.send("Data Successefully Submited!");
-  console.log("Data Successefully Submited!");
-});
-
-app.get("/user-info", (req, res) => {
-    const select = `SELECT * FROM Form`;
-
-    db.query(select, (error, results, fields) => {
+    connection.query(createTable, (error, results, fields) => {
         if(error) {
-            console.log(`Error happen in selecion ${error}`);
+            console.log(`Error Happen in Create Table ${error.message}`);
             return;
         }
-
-        res.send(results);
-    })
-})
-
-app.listen(1811, () => {
-  console.log(`Running on post http://localhost:1811`);
+        console.log(`Table Created Successfuly`)
+    });
 });
+
+app.post("/insert-student", (req, res) => {
+    const { name, email, ids, phone, age, department } = req.body;
+
+    const insertStudent = `INSERT INTO Form (Name, Email, Student_ID, Phone, Age, Department) VALUES(?, ?, ?, ?, ?, ?)`;
+
+    connection.query(insertStudent, [ name, email, ids, phone, age, department ], (error, results, fields) => {
+        if(error) {
+            console.log(`Error Happen In Inserting Info ${error}`);
+            return;
+        }
+        console.log(`Data Inserted Successfully`);
+    });
+});
+
+app.listen(2930, () => console.log(`Up Running On http://localhost:2930/`))
